@@ -1,5 +1,5 @@
 # Sui Move 101
-*This tutorial is presented by [Alock Labs](https://www.alock.club).*
+*This tutorial is presented by [Alock Labs](https://www.alock.club). Under active development.*
 
 Welcome to Sui Move 101! This repository is designed for beginners who want to learn Move, the smart contract language used on the Sui blockchain. Reference: [The Move Book](https://move-book.com/index.html). 
 
@@ -10,8 +10,10 @@ Sui Move is a fork of the Rust programming language for developing dApps on the 
 
 If you are familiar with Solidity, you will find that Sui Move is quite different. Sui doesn't have the concept of a **contract**. As a developer, you don't deploy a contract to the blockchain. Instead, you publish a **package**. A package is a collection of **modules**, which define a number of **structs and functions**.
 
+![Sui smart contract architecture](images/sui-smart-contract-architecture.png)
+
 ### Objects
-An **object** is an instance of a **struct** (that has the "key" ability, but you can ignore this for now). In a **function**, when you create an instance of a struct, you create an object. An object has its owner. 
+An **object** is an instance of a **struct** (that has the `key` ability, but you can ignore this for now). In a **function**, when you create an instance of a struct, you create an object. An object has its owner. 
 
 <ins>Object ownership rule in the simplest words</ins>: When an object is created inside a function, the function temporarily owns the object. When the function **returns** the object, the object is owned by the function caller. The owner can again pass the object to another function, while the function executes, the object is again owned by the function and it can do anything with the object.
 
