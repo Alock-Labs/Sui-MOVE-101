@@ -1,1 +1,83 @@
-# Sui-MOVE-101
+# Sui Move 101
+*This tutorial is presented by [Alock Labs](https://www.alock.club).*
+
+Welcome to Sui Move 101! This repository is designed for beginners who want to learn Move, the smart contract language used on the Sui blockchain. Reference: [The Move Book](https://move-book.com/index.html). 
+
+While The Move Book is a good source to learn Sui Move, it can be a bit overwhelming for beginners. This repository aims to provide a more structured and beginner-friendly guide to help you get started with Sui Move.
+
+## 0. Basic Concepts
+Sui Move is a fork of the Rust programming language for developing dApps on the Sui blockchain. It has an **object-centric data structures**. Note that while other blockchains like Aptos also uses Move, the Move language used on Sui is different, and this guide is specific to Sui Move. 
+
+If you are familiar with Solidity, you will find that Sui Move is quite different. Sui doesn't have the concept of a **contract**. As a developer, you don't deploy a contract to the blockchain. Instead, you publish a **package**. A package is a collection of **modules**, which define a number of **structs and functions**.
+
+### Objects
+An **object** is an instance of a **struct** (that has the "key" ability, but you can ignore this for now). In a **function**, when you create an instance of a struct, you create an object. An object has its owner. 
+
+<ins>Object ownership rule in the simplest words</ins>: When an object is created inside a function, the function temporarily owns the object. When the function **returns** the object, the object is owned by the function caller. The owner can again pass the object to another function, while the function executes, the object is again owned by the function and it can do anything with the object.
+
+An object has two categories of use cases:
+1. To actually represent something with value in the blockchain (e.g. a weapon in a game, a number of tokens, etc.)
+2. To use as an authentication pass to perform some operations. Think of it as an ID card that can be used to access certain functions. 
+
+The second category above is particularly important because it represents the access control mechanism of Sui Move. When a function requires an object as an argument, it means that only the owner of the object can call the function.
+
+## 1. Struct and ability
+**struct** is the most basic element in Sui Move, therefore it is the first thing we should learn. A struct is used to define data structures that can contain multiple fields.
+
+In Sui Move, each struct can have its abilities. Abilities define what you can do with a struct. There are four abilities in Sui Move, which are **key**, **store**, **copy**, and **drop**.
+
+An example struct named `Foo` with abilities key and store is shown below:
+
+```rust
+public struct Foo has key, store { // key and store are abilities
+    id: UID,
+    s: String
+}
+```
+
+Let's have a look at the four abilities:
+
+### `key` ability
+The first field of a struct with the `key` ability must be named `id` and of type `UID`. `UID` is a unique identifier that is used to identify each instance of the struct (i.e., each object) across the Sui blockchain.
+Having a `UID` meaning that the blockchain can identify this struct instance, which is an essential requirement to become an `object`. If your struct instances are objects that can be owned and transferred (e.g. player A creates and owns a weapon object, but later it can be transferred to another player B), you should give the struct the key ability. 
+
+### `store` ability
+It simply means that the struct can be stored as a field of another struct. See example below:
+
+```rust
+public struct Foo has store {
+    x: u64,
+    y: u64
+}
+
+public struct Bar has key {
+    id: UID,
+    foo: Foo  // Foo can be stored as a field of Bar because Foo has the store ability
+}
+```
+
+### `copy` ability
+It means that when an object reference is passed into a function, the object can be dereferenced and the value can be copied into a new object. 
+
+<ins>The `copy` ability cannot be used with the `key` ability.</ins> Because having the key ability means that the object has a `UID` field, which is unique and cannot be copied.
+
+### `drop` ability
+Objects from structs with the `drop` ability can be destroyed implicitly when it is owned by a function and the function returns.
+
+For objects without the `drop` ability, if a function wants to destroy it, the function has to explicitly unpack it. See example below:
+
+```rust
+public struct Foo {
+    x: u64,
+    y: u64
+}
+
+public fun destroy_foo(foo: Foo) {
+    let Foo { x, y } = foo; // unpack the object by declaring x and y
+}
+```
+
+But for objects with the `drop` ability, you don't have to unpack it, and if the function does not return the object, it will be destroyed automatically.
+
+
+## 2. Object State Changes
