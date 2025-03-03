@@ -10,7 +10,7 @@ Sui Move is a fork of the Rust programming language for developing dApps on the 
 
 If you are familiar with Solidity, you will find that Sui Move is quite different. Sui doesn't have the concept of a **contract**. As a developer, you don't deploy a contract to the blockchain. Instead, you publish a **package**. A package is a collection of **modules**, which define a number of **structs and functions**.
 
-![Sui smart contract architecture](images/sui-smart-contract-architecture.png)
+![Sui smart contract architecture](https://github.com/Alock-Labs/Sui-MOVE-101/blob/main/images/Sui-smart-contract-architecture.png?raw=true)
 
 ### Objects
 An **object** is an instance of a **struct** (that has the `key` ability, but you can ignore this for now). In a **function**, when you create an instance of a struct, you create an object. An object has its owner. 
@@ -81,5 +81,26 @@ public fun destroy_foo(foo: Foo) {
 
 But for objects with the `drop` ability, you don't have to unpack it, and if the function does not return the object, it will be destroyed automatically.
 
+### Special Struct: One Time Witness
+One time witness is a special struct that cannot be manually created and can only be used once. It is used as an argument in a function to ensure that the function can only be called once. A one time witness must be a struct with only the `drop` ability, has no fields, and is named after the module with all uppercase letters. To get an instance of a one time witness, you need to add it as the first argument to the module init function.
+
+```rust
+module Alock::foo;
+
+public struct FOO has drop {} // FOO is a one time witness because it satisfies the requirements
+
+public fun init(foo: FOO) {  // bar can only be called once because it requires a one time witness
+    // do something
+}
+```
+
 
 ## 2. Object State Changes
+In the last section we assumed that an object usually owned by a single account. Now we will see an object also be shared and frozen.
+
+### Shared Object
+An object can be in a shared state in the Sui blockchain. If an object is shared, any account can access the object and use the object's mutable reference as an argument in functions. 
+
+### Frozen Object
+An object can be in a frozen state in the Sui blockchain. If an object is frozen, the object is publicly readable but cannot be modified.
+
