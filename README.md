@@ -96,11 +96,50 @@ public fun init(foo: FOO) {  // bar can only be called once because it requires 
 
 
 ## 2. Object State Changes
-In the last section we assumed that an object usually owned by a single account. Now we will see an object also be shared and frozen.
+In the last section we assumed that an object usually owned by a single account. But an object also be shared and frozen.
 
 ### Shared Object
-An object can be in a shared state in the Sui blockchain. If an object is shared, any account can access the object and use the object's mutable reference as an argument in functions. 
+An object can be in a shared state in the Sui blockchain. **If an object is shared, any account can access the object and use the object's mutable reference as an argument in functions.**
+
+To create a shared object, you need to use `transfer::share_object(your_object);` **in the function that creates the object**. You don't need to return the shared object in the function. Example below:
+
+```rust
+public fun create_shared_object() {
+    let obj = Foo { id: UID::new(), s: "Hello".to_string() };
+    let shared_obj = transfer::share_object(obj); // create a shared object
+}
+```
 
 ### Frozen Object
-An object can be in a frozen state in the Sui blockchain. If an object is frozen, the object is publicly readable but cannot be modified.
+An object can be in a frozen state in the Sui blockchain. If an object is frozen, the object is publicly readable but cannot be modified. Freezing an object can be done by using `transfer::freeze_object(your_object);`, and it doesn't have to be in the function that creates the object. You don't need to return the frozen object in the function. Example below:
 
+```rust
+public fun freeze_gift(gift: Gift) {
+    transfer::freeze_object(gift);
+}
+```
+
+Frozen objects can be used as an **immutable** reference in a function argument.
+
+## 3. Function
+
+### Function Visibility
+In Sui Move, functions can be either:
+- **public**: The function can be called from outside the module and the package. 
+```rust
+public fun foo() {
+    // public function is with the public keyword
+}
+```
+- **package**: The function can be called from all modules in the same package.
+```rust
+public(package) fun foo() {
+    // package function is with the public keyword along with the package modifier
+}
+```
+- **private**: The function can only be called from within the module.
+```rust
+fun foo() {
+    // private function is without the public keyword
+}
+```
